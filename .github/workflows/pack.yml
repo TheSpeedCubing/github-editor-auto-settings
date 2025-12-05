@@ -1,0 +1,38 @@
+name: Pack Chrome Extension
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore key.pem
+        run: echo "$EXT_PRIVATE_KEY" > key.pem
+        env:
+          EXT_PRIVATE_KEY: ${{ secrets.EXT_PRIVATE_KEY }}
+
+      - name: Pack CRX using chromium-browser
+        run: |
+          chromium-browser \
+            --no-sandbox \
+            --pack-extension=./extension \
+            --pack-extension-key=key.pem
+
+      - name: Move CRX to output
+        run: mkdir output && mv extension.crx output/github-editor-auto-settings.crx
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-editor-auto-settings
+          path: output/github-editor-auto-settings.crx
