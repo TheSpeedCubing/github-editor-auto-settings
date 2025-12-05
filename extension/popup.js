@@ -11,12 +11,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     saveBtn.addEventListener('click', () => {
-        chrome.storage.sync.set({
+        const newSettings = {
             indentMode: indentMode.value,
             indentSize: indentSize.value,
             lineWrap: lineWrap.value
-        }, () => {
-			alert("Saved!!!!!");
+        };
+
+        chrome.storage.sync.set(newSettings, async () => {
+
+            chrome.tabs.query({ url: "https://github.com/*" }, (tabs) => {
+                for (const tab of tabs) {
+                    if (!tab.id) continue;
+                    chrome.tabs.sendMessage(tab.id, { type: "APPLY_SETTINGS_NOW" });
+                }
+            });
+
+            alert("Saved!");
             window.close();
         });
     });
