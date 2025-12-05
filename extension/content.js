@@ -21,7 +21,6 @@ function applySettings(settings) {
 const interval = setInterval(() => {
     const indentModeSelect = document.querySelector('select[aria-label="Indent mode"]');
     if (indentModeSelect) {
-        clearInterval(interval);
         chrome.storage.sync.get(['indentMode', 'indentSize', 'lineWrap'], applySettings);
     }
 }, 500);
